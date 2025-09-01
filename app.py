@@ -1,16 +1,13 @@
 from flask import Flask, request, render_template
 import pickle
 import os
-
-# Load the saved model and vectorizer
+from custom_transformers import NumericFeatures  # 👈 import your transformer
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(BASE_DIR, "model.pkl"), "rb") as f:
+# Load trained pipeline
+with open(os.path.join(BASE_DIR, "/Users/stephanieijere/Documents/data_science/AI assignemts/Fake News Detector/notebooks/news_pipeline.pkl"), "rb") as f:
     model = pickle.load(f)
-
-with open(os.path.join(BASE_DIR, "tfidf.pkl"), "rb") as f:
-    vectorizer = pickle.load(f)
 
 app = Flask(__name__)
 
@@ -21,8 +18,7 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     text = request.form["news_text"]
-    features = vectorizer.transform([text])
-    prediction = model.predict(features)[0]
+    prediction = model.predict([text])[0]
     
     if prediction == 1:
         result = "Real News"
